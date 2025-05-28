@@ -126,75 +126,83 @@ export default function AuthPage() {
                 </form>
               </Form>
             ) : (
-              <Form {...signupForm}>
-                <form onSubmit={signupForm.handleSubmit(onSignup)} className="space-y-6">
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={signupForm.control}
-                      name="firstName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>First Name</FormLabel>
-                          <FormControl>
-                            <Input placeholder="John" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+              <form onSubmit={signupForm.handleSubmit(onSignup)} className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label htmlFor="firstName" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                      First Name
+                    </label>
+                    <Input
+                      id="firstName"
+                      placeholder="John"
+                      {...signupForm.register('firstName')}
                     />
-                    
-                    <FormField
-                      control={signupForm.control}
-                      name="lastName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Last Name</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Doe" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    {signupForm.formState.errors.firstName && (
+                      <p className="text-sm font-medium text-destructive">
+                        {signupForm.formState.errors.firstName.message}
+                      </p>
+                    )}
                   </div>
                   
-                  <FormField
-                    control={signupForm.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input type="email" placeholder="john@example.com" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
+                  <div className="space-y-2">
+                    <label htmlFor="lastName" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                      Last Name
+                    </label>
+                    <Input
+                      id="lastName"
+                      placeholder="Doe"
+                      {...signupForm.register('lastName')}
+                    />
+                    {signupForm.formState.errors.lastName && (
+                      <p className="text-sm font-medium text-destructive">
+                        {signupForm.formState.errors.lastName.message}
+                      </p>
                     )}
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <label htmlFor="email" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                    Email
+                  </label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="john@example.com"
+                    {...signupForm.register('email')}
                   />
-                  
-                  <FormField
-                    control={signupForm.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Password</FormLabel>
-                        <FormControl>
-                          <Input type="password" placeholder="Create a strong password" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                  {signupForm.formState.errors.email && (
+                    <p className="text-sm font-medium text-destructive">
+                      {signupForm.formState.errors.email.message}
+                    </p>
+                  )}
+                </div>
+                
+                <div className="space-y-2">
+                  <label htmlFor="password" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                    Password
+                  </label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Create a strong password"
+                    {...signupForm.register('password')}
                   />
-                  
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-primary text-white hover:bg-blue-700"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? 'Creating Account...' : 'Create Account'}
-                  </Button>
-                </form>
-              </Form>
+                  {signupForm.formState.errors.password && (
+                    <p className="text-sm font-medium text-destructive">
+                      {signupForm.formState.errors.password.message}
+                    </p>
+                  )}
+                </div>
+                
+                <Button 
+                  type="submit" 
+                  className="w-full bg-primary text-white hover:bg-blue-700"
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Creating Account...' : 'Create Account'}
+                </Button>
+              </form>
             )}
             
             <p className="text-center text-gray-600 mt-6">
