@@ -42,6 +42,8 @@ export const insertUserSchema = createInsertSchema(users).pick({
   weeklyWorkoutGoal: true,
   targetWeight: true,
   primaryGoal: true,
+}).extend({
+  email: z.string().email("Please enter a valid email address"),
 });
 
 export const insertWorkoutSchema = createInsertSchema(workouts).pick({

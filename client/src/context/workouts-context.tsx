@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import type { Workout, InsertWorkout } from '@shared/schema';
 import { useAuth } from './auth-context';
-import { apiRequest } from '@/lib/queryClient';
+import { localWorkouts } from '@/lib/localStorage';
 
 interface WorkoutsContextType {
   workouts: Workout[];
@@ -24,11 +24,8 @@ export function WorkoutsProvider({ children }: { children: React.ReactNode }) {
     
     setLoading(true);
     try {
-      const response = await fetch(`/api/workouts/user/${user.id}`);
-      if (response.ok) {
-        const data = await response.json();
-        setWorkouts(data);
-      }
+      const data = await localWorkouts.getWorkoutsByUser(user.id);
+      setWorkouts(data);
     } catch (error) {
       console.error('Failed to fetch workouts:', error);
     } finally {
@@ -44,11 +41,10 @@ export function WorkoutsProvider({ children }: { children: React.ReactNode }) {
     if (!user) throw new Error('No user logged in');
     
     try {
-      const response = await apiRequest('POST', '/api/workouts', {
+      const newWorkout = await localWorkouts.createWorkout({
         ...workoutData,
         userId: user.id
       });
-      const newWorkout = await response.json();
       setWorkouts(prev => [newWorkout, ...prev]);
     } catch (error) {
       throw new Error('Failed to add workout');
@@ -57,8 +53,7 @@ export function WorkoutsProvider({ children }: { children: React.ReactNode }) {
 
   const updateWorkout = async (id: number, updates: Partial<InsertWorkout>) => {
     try {
-      const response = await apiRequest('PUT', `/api/workouts/${id}`, updates);
-      const updatedWorkout = await response.json();
+      const updatedWorkout = await localWorkouts.updateWorkout(id, updates);
       setWorkouts(prev => prev.map(w => w.id === id ? updatedWorkout : w));
     } catch (error) {
       throw new Error('Failed to update workout');
@@ -67,7 +62,7 @@ export function WorkoutsProvider({ children }: { children: React.ReactNode }) {
 
   const deleteWorkout = async (id: number) => {
     try {
-      await apiRequest('DELETE', `/api/workouts/${id}`);
+      await localWorkouts.deleteWorkout(id);
       setWorkouts(prev => prev.filter(w => w.id !== id));
     } catch (error) {
       throw new Error('Failed to delete workout');

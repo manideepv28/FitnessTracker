@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import type { User, LoginData, SignupData } from '@shared/schema';
-import { apiRequest } from '@/lib/queryClient';
+import { localAuth } from '@/lib/localStorage';
 
 interface AuthContextType {
   user: User | null;
@@ -18,33 +18,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Check localStorage for existing auth
-    const savedAuth = localStorage.getItem('fittracker_auth');
-    const savedUser = localStorage.getItem('fittracker_user');
-    
-    if (savedAuth === 'true' && savedUser) {
+    // Check for existing authenticated user
+    const checkAuth = async () => {
       try {
-        const userData = JSON.parse(savedUser);
-        setUser(userData);
-        setIsAuthenticated(true);
+        const currentUser = await localAuth.getCurrentUser();
+        if (currentUser) {
+          setUser(currentUser);
+          setIsAuthenticated(true);
+        }
       } catch (error) {
-        // Clear invalid data
-        localStorage.removeItem('fittracker_auth');
-        localStorage.removeItem('fittracker_user');
+        console.error('Failed to check auth:', error);
       }
-    }
+    };
+    
+    checkAuth();
   }, []);
 
   const login = async (data: LoginData) => {
     try {
-      const response = await apiRequest('POST', '/api/auth/login', data);
-      const { user: userData } = await response.json();
-      
+      const userData = await localAuth.login(data.email, data.password);
       setUser(userData);
       setIsAuthenticated(true);
-      
-      localStorage.setItem('fittracker_auth', 'true');
-      localStorage.setItem('fittracker_user', JSON.stringify(userData));
     } catch (error) {
       throw new Error('Invalid email or password');
     }
@@ -52,36 +46,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signup = async (data: SignupData) => {
     try {
-      const response = await apiRequest('POST', '/api/auth/signup', data);
-      const { user: userData } = await response.json();
-      
+      const userData = await localAuth.signup(data);
       setUser(userData);
       setIsAuthenticated(true);
-      
-      localStorage.setItem('fittracker_auth', 'true');
-      localStorage.setItem('fittracker_user', JSON.stringify(userData));
     } catch (error) {
       throw new Error('Failed to create account');
     }
   };
 
   const logout = () => {
+    localAuth.logout();
     setUser(null);
     setIsAuthenticated(false);
-    
-    localStorage.removeItem('fittracker_auth');
-    localStorage.removeItem('fittracker_user');
   };
 
   const updateProfile = async (updates: Partial<User>) => {
     if (!user) throw new Error('No user logged in');
     
     try {
-      const response = await apiRequest('PUT', `/api/user/${user.id}`, updates);
-      const updatedUser = await response.json();
-      
+      const updatedUser = await localAuth.updateUser(user.id, updates);
       setUser(updatedUser);
-      localStorage.setItem('fittracker_user', JSON.stringify(updatedUser));
     } catch (error) {
       throw new Error('Failed to update profile');
     }
