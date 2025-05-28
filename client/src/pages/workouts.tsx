@@ -23,7 +23,7 @@ export default function WorkoutsPage() {
   });
 
   const filteredWorkouts = workouts.filter(workout => {
-    if (filters.type && workout.type !== filters.type) return false;
+    if (filters.type && filters.type !== 'all' && workout.type !== filters.type) return false;
     if (filters.dateFrom && workout.date < filters.dateFrom) return false;
     if (filters.dateTo && workout.date > filters.dateTo) return false;
     return true;
@@ -58,7 +58,7 @@ export default function WorkoutsPage() {
 
   const clearFilters = () => {
     setFilters({
-      type: '',
+      type: 'all',
       dateFrom: '',
       dateTo: ''
     });
@@ -96,7 +96,7 @@ export default function WorkoutsPage() {
                   <SelectValue placeholder="All Types" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Types</SelectItem>
+                  <SelectItem value="all">All Types</SelectItem>
                   <SelectItem value="running">Running</SelectItem>
                   <SelectItem value="cycling">Cycling</SelectItem>
                   <SelectItem value="strength">Strength Training</SelectItem>

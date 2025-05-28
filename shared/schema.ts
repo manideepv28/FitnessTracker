@@ -63,6 +63,7 @@ export const loginSchema = z.object({
 
 export const signupSchema = insertUserSchema.extend({
   password: z.string().min(6),
+  email: z.string().email("Please enter a valid email address"),
 });
 
 export type User = typeof users.$inferSelect;
